@@ -46,7 +46,7 @@ contract SupplyChain {
         newProduct.owners.push(msg.sender);
 
         emit ProductManufactured(productCounter, _name, msg.sender);
-    } // Close the manufactureProduct function properly
+    } 
 
     // Step 2: Manufacturer ships the product to distributor/retailer
     function shipProduct(uint _productId, address _to) public onlyOwner(_productId) {
@@ -57,5 +57,15 @@ contract SupplyChain {
         products[_productId].owners.push(_to);
 
         emit ProductShipped(_productId, msg.sender, _to);
+    }
+
+    // step3 : retailer puts the product for sale
+    function putforsale(uint _productId,uint _price) public onlyOwner(_productId) {
+        require(products[_productId].state== State.Shipped,"product not ready for sale");
+        products[_productId].state = State.ForSale;
+        products[_productId].price = _price;
+
+        emit ProductForSale(_productId, _price);
+
     }
 }
