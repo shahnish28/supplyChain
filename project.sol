@@ -68,4 +68,23 @@ contract SupplyChain {
         emit ProductForSale(_productId, _price);
 
     }
+
+    function buyProduct(uint _productId) public payable {
+        require(products[_productId].state == State.ForSale, "Product not for sale");
+        require(msg.value >= products[_productId].price, "Insufficient payment");
+
+        products[_productId].state = State.Sold;
+        products[_productId].currentOwner = msg.sender;
+        products[_productId].owners.push(msg.sender);
+
+        // Transfer the payment to the seller
+        payable(products[_productId].owners[products[_productId].owners.length - 2]).transfer(msg.value);
+
+        emit ProductSold(_productId, products[_productId].owners[products[_productId].owners.length - 2], msg.sender, msg.value);
+    }
+
+    // View product history (who owned the product)
+    function viewProductHistory(uint _productId) public view returns (address[] memory) {
+        return products[_productId].owners;
+    }
 }
